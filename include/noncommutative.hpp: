@@ -1,0 +1,77 @@
+cd ~/Pseudo-Paradox
+
+cat << 'EOF' > core-engine/include/noncommutative.hpp
+#ifndef PSEUDO_PARADOX_NONCOMMUTATIVE_HPP
+#define PSEUDO_PARADOX_NONCOMMUTATIVE_HPP
+
+#include <Eigen/Dense>
+#include <complex>
+#include <string>
+#include <memory>
+
+namespace PseudoParadox {
+
+    // Using standard double-precision complex floats for quantum wave amplitudes
+    using Complexd = std::complex<double>;
+    using QuantumMatrix = Eigen::MatrixXcd;
+
+    class QuantumOperator {
+    public:
+        // ==============================================================================
+        // CONSTRUCTORS & LIFECYCLE MANAGEMENT
+        // ==============================================================================
+        explicit QuantumOperator(int dimension);
+        QuantumOperator(int dimension, const QuantumMatrix& initial_matrix);
+        ~QuantumOperator() = default;
+
+        // Rule of Five compliance for clean memory footprint management
+        QuantumOperator(const QuantumOperator& other) = default;
+        QuantumOperator& operator=(const QuantumOperator& other) = default;
+        QuantumOperator(QuantumOperator&& other) noexcept = default;
+        QuantumOperator& operator=(QuantumOperator&& other) noexcept = default;
+
+        // ==============================================================================
+        // OVERLOADED MATHEMATICAL OPERATIONS
+        // ==============================================================================
+        QuantumOperator operator+(const QuantumOperator& other) const;
+        QuantumOperator operator-(const QuantumOperator& other) const;
+        QuantumOperator operator*(const QuantumOperator& other) const; // Matrix multiplication
+        QuantumOperator operator*(const Complexd& scalar) const;       // Scalar multiplication
+
+        // ==============================================================================
+        // NONCOMMUTATIVE ALGEBRA METRICS
+        // ==============================================================================
+        /**
+         * Enforces the mathematical commutator bracket: [A, B] = AB - BA
+         * If the system is commutative, this returns a zero matrix.
+         * For our pseudo-paradox world, this will yield non-zero topological deviations.
+         */
+        static QuantumOperator commutator(const QuantumOperator& A, const QuantumOperator& B);
+
+        /**
+         * Checks if the operator commutes with another operator within an epsilon threshold.
+         */
+        bool commutes_with(const QuantumOperator& other, double epsilon = 1e-9) const;
+
+        // ==============================================================================
+        // QUANTUM HARDWARE ALIGNMENT ACCESSORS
+        // ==============================================================================
+        [[nodiscard]] int get_dimension() const noexcept { return dimension_; }
+        [[nodiscard]] const QuantumMatrix& get_raw_matrix() const noexcept { return matrix_; }
+        QuantumMatrix& get_mutable_matrix() noexcept { return matrix_; }
+
+        /**
+         * Verifies if the matrix is Hermitian (self-adjoint: A = A^†).
+         * Quantum mechanical observables MUST be Hermitian to guarantee real eigenvalues!
+         */
+        [[nodiscard]] bool is_hermitian(double epsilon = 1e-9) const;
+
+    private:
+        int dimension_;
+        QuantumMatrix matrix_;
+    };
+
+} // namespace PseudoParadox
+
+#endif // PSEUDO_PARADOX_NONCOMMUTATIVE_HPP
+EOF
