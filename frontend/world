@@ -1,0 +1,91 @@
+# 1. Step directly into your empty world directory
+cd ~/Pseudo-Paradox/frontend/src/world
+
+# 2. Inject the Scene Viewport engine code
+cat << 'EOF' > Scene.js
+import * as THREE from 'three';
+
+export class QuantumWorld {
+    constructor() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x050505);
+        this.scene.fog = new THREE.FogExp2(0x050505, 0.015);
+
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set(0, 15, 25);
+        this.camera.lookAt(0, 0, 0);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.body.appendChild(this.renderer.domElement);
+
+        this.addLighting();
+        this.addGridAnchor();
+
+        window.addEventListener('resize', () => this.onWindowResize());
+    }
+
+    addLighting() {
+        const ambient = new THREE.AmbientLight(0x333333);
+        this.scene.add(ambient);
+        const point = new THREE.PointLight(0xff007f, 2, 100);
+        point.position.set(10, 20, 10);
+        this.scene.add(point);
+    }
+
+    addGridAnchor() {
+        const grid = new THREE.GridHelper(40, 40, 0xff007f, 0x222222);
+        grid.position.y = -0.01;
+        this.scene.add(grid);
+    }
+
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    render(time) {
+        const radius = 30;
+        this.camera.position.x = Math.sin(time * 0.0001) * radius;
+        this.camera.position.z = Math.cos(time * 0.0001) * radius;
+        this.camera.lookAt(0, 0, 0);
+        this.renderer.render(this.scene, this.camera);
+    }
+}
+EOF
+
+# 3. Inject the Mesh Topology builder code
+cat << 'EOF' > MeshGeometry.js
+import * as THREE from 'three';
+
+export class QuantumMesh {
+    constructor(scene) {
+        this.scene = scene;
+        this.size = 20; 
+        this.geometry = new THREE.PlaneGeometry(30, 30, this.size - 1, this.size - 1);
+        this.geometry.rotateX(-Math.PI / 2); 
+        
+        this.material = new THREE.MeshBasicMaterial({
+            color: 0xff007f,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        this.mesh = new THREE.Mesh(this.geometry, this.material);
+        this.scene.add(this.mesh);
+    }
+
+    updateMeshTopology(serverData) {
+        if (!serverData) return;
+        const positionAttribute = this.geometry.attributes.position;
+        for (let i = 0; i < serverData.length; i++) {
+            if (i >= positionAttribute.count) break;
+            positionAttribute.setY(i, serverData[i].y);
+        }
+        positionAttribute.needsUpdate = true;
+    }
+}
+EOF

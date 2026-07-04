@@ -1,3 +1,6 @@
+cd ~/Pseudo-Paradox
+
+cat << 'EOF' > frontend/src/api/websocket.js
 export class QuantumStreamClient {
     constructor(serverUrl, onDataReceived) {
         this.serverUrl = serverUrl;
@@ -45,3 +48,4 @@ export class QuantumStreamClient {
         }
     }
 }
+EOF
