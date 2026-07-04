@@ -1,33 +1,28 @@
-cat << 'EOF' > frontend/src/main.js
 import { QuantumWorld } from './world/Scene.js';
 import { QuantumMesh } from './world/MeshGeometry.js';
 import { QuantumStreamClient } from './api/websocket.js';
 
-// 1. Fire up the Core 3D Scene Manager Context
-const world = new THREE.QuantumWorld ? new THREE.QuantumWorld() : new QuantumWorld();
+// Initialize the 3D graphics canvas context
+const world = new QuantumWorld();
 
-// 2. Initialize the Topological Mesh Plane Geometry Landscape
+// Scaffold out the 3D landscape lines mesh 
 const quantumMesh = new QuantumMesh(world.scene);
 
-// 3. Connect the real-time WebSocket client bridge
+// Connect your WebSocket client directly to the running backend data stream
 const streamClient = new QuantumStreamClient(
     "ws://127.0.0.1:8000/ws/quantum-flow", 
-    (incomingGeometryData) => {
-        // Dynamically warp vertex points when packets stream in
-        quantumMesh.updateMeshTopology(incomingGeometryData);
+    (incomingGeometryPackets) => {
+        quantumMesh.updateMeshTopology(incomingGeometryPackets);
     }
 );
-
-// Engage the data link layer
 streamClient.connect();
 
-// 4. Frame Execution Processing Animation Loop
+// Continuous animation loop pipeline
 function animate(timestamp) {
     requestAnimationFrame(animate);
     world.render(timestamp);
 }
 
-// Spark up the execution engine pipeline
+// Spark up the engine
 requestAnimationFrame(animate);
-console.log("// PSEUDO-PARADOX INTEGRATED GRAPHICS & DATA SUBSYSTEMS ONLINE //");
-EOF
+console.log("// PSEUDO-PARADOX V1 ENGINE ACTIVATED SUCCESSFULLY //");
