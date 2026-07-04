@@ -1,0 +1,25 @@
+cd ~/Pseudo-Paradox
+
+# 1. High-Performance C++ Math Engine Folders
+mkdir -p core-engine/include
+mkdir -p core-engine/src
+mkdir -p core-engine/tests
+
+# 2. Python Orchestration & Communication Server Folders
+mkdir -p server/wrappers
+mkdir -p server/api
+mkdir -p server/math_helpers
+
+# 3. JavaScript 3D World Frontend Folders
+mkdir -p frontend/src/world
+mkdir -p frontend/src/api
+mkdir -p frontend/src/shaders
+mkdir -p frontend/public
+
+# 4. Automation GitHub CI/CD Actions Folder
+mkdir -p .github/workflows
+
+# 5. Place tracking files so Git commits empty directories instantly
+touch core-engine/include/.gitkeep core-engine/src/.gitkeep core-engine/tests/.gitkeep
+touch server/wrappers/.gitkeep server/api/.gitkeep server/math_helpers/.gitkeep
+touch frontend/src/world/.gitkeep frontend/src/api/.gitkeep frontend/src/shaders/.gitkeep frontend/public/.gitkeep
